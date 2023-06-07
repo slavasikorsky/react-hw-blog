@@ -8,9 +8,9 @@ Features:
 
 TODO:
 
--- Show posts from DB instead faceAPI posts
--- New page with user settings - Profile
--- Refactoring TS
+-   Show posts from DB instead faceAPI posts
+-   New page with user settings - Profile
+-   Refactoring TS
 
 ## API
 
