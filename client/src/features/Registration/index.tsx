@@ -12,18 +12,15 @@ function Registration() {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const BASE_URL = "http://localhost:5010/user/registration";
-	const [data, error, { handler: setFetch }] = useFetch(BASE_URL, "POST");
+	const [data, error, { handler: setFetch }] = useFetch("POST");
 	const submitHandler = (newUser: IInputItem) => {
-		setFetch(newUser);
+		setFetch(BASE_URL, newUser);
 	};
 
 	useEffect(() => {
 		if (data && !data.message) {
-			console.log(data);
 			dispatch(login(data));
 			navigate("/");
-		} else {
-			console.log(data);
 		}
 	}, [data]);
 
