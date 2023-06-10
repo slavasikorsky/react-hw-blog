@@ -4,15 +4,15 @@ import * as yup from "yup";
 import { useState } from "react";
 
 type Inputs = {
-	title: string;
-	body: string;
+	title?: string;
+	body?: string;
 	categories?: string;
 	tag?: string;
-	file: string;
+	file?: string;
 };
 
 type FormProps = {
-	onSubmit: (values: Inputs) => void;
+	onSubmit: (data: Inputs) => void;
 	values?: Inputs;
 };
 
@@ -41,10 +41,11 @@ function Form({ onSubmit, values }: FormProps) {
 
 	const changeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, files } = e.target;
-		setValue({ ...value, [name]: files[0] });
+		setValue({ ...value, [name]: files?.[0] });
 	};
 
 	const changeForm = (e: React.ChangeEvent<HTMLInputElement>) => {
+		console.log(value);
 		setValue({ ...value, [e.target.name]: e.target.value });
 	};
 
@@ -105,5 +106,5 @@ function Form({ onSubmit, values }: FormProps) {
 export default Form;
 
 Form.defaultProps = {
-	values: undefined,
+	values: null,
 };
