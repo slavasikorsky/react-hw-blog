@@ -33,3 +33,11 @@ export interface IInputItem {
 	required: boolean;
 	value?: string;
 }
+
+export type Inputs = {
+	title?: string;
+	body?: string;
+	categories?: string;
+	tag?: string;
+	file?: string;
+};

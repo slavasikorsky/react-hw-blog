@@ -16,7 +16,10 @@ function Users() {
 	// get all users
 	const [data, error, { handler: setFetch }] = useFetch("GET");
 
-	const editHandler = async (e, id) => {
+	const editHandler = async (
+		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+		id: number
+	) => {
 		e.preventDefault();
 		console.log(id);
 	};

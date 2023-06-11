@@ -2,14 +2,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useState } from "react";
-
-type Inputs = {
-	title?: string;
-	body?: string;
-	categories?: string;
-	tag?: string;
-	file?: string;
-};
+import { Inputs } from "../../types/types";
 
 type FormProps = {
 	onSubmit: (data: Inputs) => void;

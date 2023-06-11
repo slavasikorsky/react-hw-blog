@@ -5,6 +5,7 @@ import Form from "../../components/Form";
 import Popup from "../../components/Popup";
 import Button from "../../components/Button";
 import useFetch from "../../hooks/useFetch";
+import { Inputs } from "../../types/types";
 
 interface DataRow {
 	_id: number;
@@ -15,7 +16,7 @@ interface DataRow {
 
 function Posts() {
 	const [openPopup, setOpenPopup] = useState(false);
-	const [posts, setPosts] = useState([]);
+	const [posts, setPosts] = useState<DataRow[]>([]);
 	const [editPost, setEditPost] = useState(false);
 
 	const BASE_URL = "http://localhost:5010/posts/";
@@ -28,14 +29,20 @@ function Posts() {
 	const [dataPostUpdate, postUpdateError, { handler: updatePost }] =
 		useFetch("PATCH");
 
-	const editHandler = async (e, id) => {
+	const editHandler = async (
+		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+		id: number
+	) => {
 		e.preventDefault();
 		const editContent = posts.filter((post) => post._id === id);
 		setEditPost(editContent[0]);
 		setOpenPopup(!openPopup);
 	};
 
-	const deleteHandler = async (e, id) => {
+	const deleteHandler = async (
+		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+		id: number
+	) => {
 		e.preventDefault();
 		deletePost(`${BASE_URL}${id}`);
 	};
@@ -45,7 +52,7 @@ function Posts() {
 		setOpenPopup(!openPopup);
 	};
 
-	const createHandler = (values) => {
+	const createHandler = (values: Inputs) => {
 		const id = editPost._id;
 		if (id) {
 			updatePost(`${BASE_URL}${id}`, values);
@@ -94,7 +101,6 @@ function Posts() {
 
 	useEffect(() => {
 		setFetch(BASE_URL);
-		console.log(newPostResponse);
 	}, [newPostResponse, postDelete, dataPostUpdate]);
 
 	useEffect(() => {
