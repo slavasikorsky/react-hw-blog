@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import styled from "styled-components";
-import { Inputs } from "../../types/types";
+import { PostInterface } from "../../types/types";
 import { RootState } from "../../store/store";
 import Post from "../../components/Card";
 import Container from "../../components/Container";
@@ -15,7 +15,7 @@ const CardsWrapper = styled.div`
 `;
 
 function Blog() {
-	const [posts, setPosts] = useState(null);
+	const [posts, setPosts] = useState<PostInterface[] | null>(null);
 	const count = useSelector((state: RootState) => state.counter.value);
 
 	const BASE_URL = "http://localhost:5010/posts/";
@@ -45,7 +45,7 @@ function Blog() {
 				{count}
 				<CardsWrapper>
 					{posts &&
-						posts.map((item: Inputs) => (
+						posts.map((item: PostInterface) => (
 							<Post
 								key={item._id}
 								id={item._id}

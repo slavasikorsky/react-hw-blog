@@ -2,11 +2,11 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useState } from "react";
-import { Inputs } from "../../types/types";
+import { PostInterface } from "../../types/types";
 
 type FormProps = {
-	onSubmit: (data: Inputs) => void;
-	values?: Inputs;
+	onSubmit: (data: PostInterface) => void;
+	values: PostInterface;
 };
 
 const schema = yup.object().shape({
@@ -22,11 +22,11 @@ function Form({ onSubmit, values }: FormProps) {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<Inputs>({
+	} = useForm<PostInterface>({
 		resolver: yupResolver(schema),
 	});
 
-	const [value, setValue] = useState<Inputs>(values);
+	const [value, setValue] = useState<PostInterface>(values);
 
 	const submitForm = () => {
 		onSubmit(value);
@@ -96,7 +96,3 @@ function Form({ onSubmit, values }: FormProps) {
 }
 
 export default Form;
-
-Form.defaultProps = {
-	values: undefined,
-};

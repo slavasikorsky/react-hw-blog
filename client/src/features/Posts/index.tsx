@@ -4,7 +4,7 @@ import DataTable, { TableColumn } from "react-data-table-component";
 import Form from "../../components/Form";
 import Popup from "../../components/Popup";
 import Button from "../../components/Button";
-import { Inputs } from "../../types/types";
+import { PostInterface } from "../../types/types";
 
 interface DataRow {
 	_id: number;
@@ -17,7 +17,7 @@ interface DataRow {
 function Posts() {
 	const [openPopup, setOpenPopup] = useState(false);
 	const [posts, setPosts] = useState<DataRow[]>([]);
-	const [editPost, setEditPost] = useState<Inputs | null>(null);
+	const [editPost, setEditPost] = useState<PostInterface | null>(null);
 
 	const BASE_URL = "http://localhost:5010/posts/";
 
@@ -44,8 +44,7 @@ function Posts() {
 		setOpenPopup(!openPopup);
 	};
 
-	const editPostHandler = async (updatedContent: Inputs) => {
-		console.log(updatedContent);
+	const editPostHandler = async (updatedContent: PostInterface) => {
 		try {
 			await axios.patch(
 				`${BASE_URL}${updatedContent._id}`,
@@ -67,6 +66,7 @@ function Posts() {
 		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
 		id: number
 	) => {
+		e.preventDefault();
 		try {
 			await axios.delete(`${BASE_URL}${id}`, {
 				headers: {
@@ -84,7 +84,7 @@ function Posts() {
 		setOpenPopup(!openPopup);
 	};
 
-	const createPost = async (args: Inputs) => {
+	const createPost = async (args: PostInterface) => {
 		try {
 			const formData = new FormData();
 			Object.entries(args).forEach(([key, value]) => {
@@ -107,7 +107,7 @@ function Posts() {
 		}
 	};
 
-	const createHandler = async (values: Inputs) => {
+	const createHandler = async (values: PostInterface) => {
 		const id = editPost?._id;
 		if (id) {
 			editPostHandler(values);

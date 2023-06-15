@@ -34,11 +34,15 @@ export interface IInputItem {
 	value?: string;
 }
 
-export type Inputs = {
+export interface PostInterface {
 	_id?: number;
-	title?: string;
-	body?: string;
-	categories?: string;
-	tag?: string;
+	title: string;
+	body: string;
+	tag?: string[];
+	categories?: string[];
 	thumbnail?: string;
-};
+	likes?: number;
+	views?: number;
+	createdAt?: Date;
+	comments?: [];
+}
