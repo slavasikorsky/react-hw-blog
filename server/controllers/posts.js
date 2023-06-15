@@ -39,14 +39,12 @@ export const getPosts = async (req, res) => {
 };
 
 export const createPost = async (req, res) => {
-	console.log(req.body.file);
-	if (req.body.file == undefined) {
+	if (req.file == undefined) {
 		return res.json({ message: "Error: No File Selected!" });
 	}
 
-	const { title, body, tag, categories, slug, file } = req.body;
-
-	const fullUrl = `http://localhost:${PORT}/uploads/${file}`;
+	const { title, body, tag, categories, slug } = req.body;
+	const fullUrl = `http://localhost:${PORT}/uploads/${req.file.filename}`;
 
 	const post = new Post({
 		title,
