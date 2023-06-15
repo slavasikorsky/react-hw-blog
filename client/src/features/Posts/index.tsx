@@ -4,7 +4,6 @@ import DataTable, { TableColumn } from "react-data-table-component";
 import Form from "../../components/Form";
 import Popup from "../../components/Popup";
 import Button from "../../components/Button";
-import useFetch from "../../hooks/useFetch";
 import { Inputs } from "../../types/types";
 
 interface DataRow {
@@ -18,14 +17,22 @@ interface DataRow {
 function Posts() {
 	const [openPopup, setOpenPopup] = useState(false);
 	const [posts, setPosts] = useState<DataRow[]>([]);
-	const [editPost, setEditPost] = useState(false);
+	const [editPost, setEditPost] = useState<Inputs | null>(null);
 
 	const BASE_URL = "http://localhost:5010/posts/";
-	// get all posts
-	const [data, error, { handler: setFetch }] = useFetch("GET");
 
-	const [dataPostUpdate, postUpdateError, { handler: updatePost }] =
-		useFetch("PATCH");
+	const getAllPosts = async () => {
+		try {
+			const result = await axios.get(BASE_URL, {
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+			setPosts(result.data.data);
+		} catch (err) {
+			console.log("Error:", err);
+		}
+	};
 
 	const editHandler = async (
 		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -35,6 +42,25 @@ function Posts() {
 		const editContent = posts.filter((post) => post._id === id);
 		setEditPost(editContent[0]);
 		setOpenPopup(!openPopup);
+	};
+
+	const editPostHandler = async (updatedContent: Inputs) => {
+		console.log(updatedContent);
+		try {
+			await axios.patch(
+				`${BASE_URL}${updatedContent._id}`,
+				updatedContent,
+				{
+					headers: {
+						"Content-Type": "application/json",
+					},
+				}
+			);
+			getAllPosts();
+			setOpenPopup(!openPopup);
+		} catch (err) {
+			console.log("Error:", err);
+		}
 	};
 
 	const deleteHandler = async (
@@ -47,7 +73,7 @@ function Posts() {
 					"Content-Type": "multipart/form-data",
 				},
 			});
-			setFetch(BASE_URL);
+			getAllPosts();
 		} catch (err) {
 			console.log("Error:", err);
 		}
@@ -75,7 +101,7 @@ function Posts() {
 					"Content-Type": "multipart/form-data",
 				},
 			});
-			setFetch(BASE_URL);
+			getAllPosts();
 		} catch (err) {
 			console.log("Error:", err);
 		}
@@ -84,10 +110,7 @@ function Posts() {
 	const createHandler = async (values: Inputs) => {
 		const id = editPost._id;
 		if (id) {
-			updatePost(`${BASE_URL}${id}`, values);
-			console.log(postUpdateError);
-			console.log(dataPostUpdate);
-
+			editPostHandler(values);
 			// clear
 			setOpenPopup(!openPopup);
 			setEditPost(false);
@@ -129,18 +152,13 @@ function Posts() {
 	];
 
 	useEffect(() => {
-		setFetch(BASE_URL);
-	}, [dataPostUpdate]);
-
-	useEffect(() => {
-		setPosts(data.data);
-	}, [data]);
+		getAllPosts();
+	}, []);
 
 	return (
 		<>
 			<h1>Posts</h1>
-			{error && <p>{error.message}</p>}
-			{data && <DataTable columns={columns} data={posts} />}
+			{posts && <DataTable columns={columns} data={posts} />}
 			<Button onClick={() => createPostHandler()}>Create new post</Button>
 			<Popup trigger={openPopup} setTrigger={setOpenPopup}>
 				<Form onSubmit={createHandler} values={editPost} />

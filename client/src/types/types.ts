@@ -35,6 +35,7 @@ export interface IInputItem {
 }
 
 export type Inputs = {
+	_id?: number;
 	title?: string;
 	body?: string;
 	categories?: string;

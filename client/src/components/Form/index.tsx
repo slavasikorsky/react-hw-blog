@@ -39,7 +39,6 @@ function Form({ onSubmit, values }: FormProps) {
 
 	const changeForm = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setValue({ ...value, [e.target.name]: e.target.value });
-		console.log(value);
 	};
 
 	return (
