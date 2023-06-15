@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import axios from "axios";
 import DataTable, { TableColumn } from "react-data-table-component";
 import Form from "../../components/Form";
 import Popup from "../../components/Popup";
@@ -12,6 +12,7 @@ interface DataRow {
 	title: string;
 	body: string;
 	editRow: (row: DataRow) => JSX.Element;
+	deleteRow: (row: DataRow) => JSX.Element;
 }
 
 function Posts() {
@@ -22,10 +23,7 @@ function Posts() {
 	const BASE_URL = "http://localhost:5010/posts/";
 	// get all posts
 	const [data, error, { handler: setFetch }] = useFetch("GET");
-	const [newPostResponse, postError, { handler: setNewPost }] =
-		useFetch("POST");
-	const [postDelete, poseDeleteError, { handler: deletePost }] =
-		useFetch("DELETE");
+
 	const [dataPostUpdate, postUpdateError, { handler: updatePost }] =
 		useFetch("PATCH");
 
@@ -43,8 +41,16 @@ function Posts() {
 		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
 		id: number
 	) => {
-		e.preventDefault();
-		deletePost(`${BASE_URL}${id}`);
+		try {
+			await axios.delete(`${BASE_URL}${id}`, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			});
+			setFetch(BASE_URL);
+		} catch (err) {
+			console.log("Error:", err);
+		}
 	};
 
 	const createPostHandler = () => {
@@ -52,7 +58,30 @@ function Posts() {
 		setOpenPopup(!openPopup);
 	};
 
-	const createHandler = (values: Inputs) => {
+	const createPost = async (args: Inputs) => {
+		try {
+			const formData = new FormData();
+			Object.entries(args).forEach(([key, value]) => {
+				if (Array.isArray(value)) {
+					value.forEach((item) => {
+						formData.append(key, item);
+					});
+				} else {
+					formData.append(key, value);
+				}
+			});
+			await axios.post(BASE_URL, formData, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			});
+			setFetch(BASE_URL);
+		} catch (err) {
+			console.log("Error:", err);
+		}
+	};
+
+	const createHandler = async (values: Inputs) => {
 		const id = editPost._id;
 		if (id) {
 			updatePost(`${BASE_URL}${id}`, values);
@@ -63,7 +92,7 @@ function Posts() {
 			setOpenPopup(!openPopup);
 			setEditPost(false);
 		} else {
-			setNewPost(BASE_URL, values);
+			createPost(values);
 			setOpenPopup(!openPopup);
 		}
 	};
@@ -101,7 +130,7 @@ function Posts() {
 
 	useEffect(() => {
 		setFetch(BASE_URL);
-	}, [newPostResponse, postDelete, dataPostUpdate]);
+	}, [dataPostUpdate]);
 
 	useEffect(() => {
 		setPosts(data.data);
@@ -110,12 +139,10 @@ function Posts() {
 	return (
 		<>
 			<h1>Posts</h1>
-			{poseDeleteError && <p>{poseDeleteError}</p>}
 			{error && <p>{error.message}</p>}
 			{data && <DataTable columns={columns} data={posts} />}
 			<Button onClick={() => createPostHandler()}>Create new post</Button>
 			<Popup trigger={openPopup} setTrigger={setOpenPopup}>
-				{postError && { postError }}
 				<Form onSubmit={createHandler} values={editPost} />
 			</Popup>
 		</>

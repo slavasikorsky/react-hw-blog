@@ -4,7 +4,7 @@ const useFetch = (method: "POST" | "PUT" | "DELETE" | "GET" | "PATCH") => {
 	const [data, setData] = useState<any>(false);
 	const [error, setError] = useState<string | unknown>(null);
 
-	const handler = async (URL: string, body: FormData | null = null) => {
+	const handler = async (URL: string, body: FormData) => {
 		const response = await fetch(URL, {
 			method,
 			headers: {

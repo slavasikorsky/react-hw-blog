@@ -14,7 +14,7 @@ const schema = yup.object().shape({
 	body: yup.string().required("Please write body"),
 	categories: yup.string(),
 	tag: yup.string(),
-	file: yup.string().required("Please add image"),
+	thumbnail: yup.mixed(),
 });
 
 function Form({ onSubmit, values }: FormProps) {
@@ -26,10 +26,10 @@ function Form({ onSubmit, values }: FormProps) {
 		resolver: yupResolver(schema),
 	});
 
-	const [value, setValue] = useState<Inputs | undefined>(values);
+	const [value, setValue] = useState<Inputs>(values);
 
-	const submitForm = (data: Inputs) => {
-		onSubmit(data);
+	const submitForm = () => {
+		onSubmit(value);
 	};
 
 	const changeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,8 +38,8 @@ function Form({ onSubmit, values }: FormProps) {
 	};
 
 	const changeForm = (e: React.ChangeEvent<HTMLInputElement>) => {
-		console.log(value);
 		setValue({ ...value, [e.target.name]: e.target.value });
+		console.log(value);
 	};
 
 	return (
@@ -47,7 +47,7 @@ function Form({ onSubmit, values }: FormProps) {
 			<h2>Create new post</h2>
 			{errors?.title?.message}
 			{errors?.body?.message}
-			{errors?.file?.message}
+			{errors?.thumbnail?.message}
 			<form onSubmit={handleSubmit(submitForm)}>
 				<input
 					type="text"
@@ -77,19 +77,19 @@ function Form({ onSubmit, values }: FormProps) {
 					{...register("tag")}
 					onChange={changeForm}
 				/>
-				<label htmlFor="file" className="label">
+				<label htmlFor="thumbnail" className="label">
 					<span>
-						{JSON.stringify(value?.file) || "No file selected..."}
+						{JSON.stringify(value?.thumbnail) ||
+							"No file selected..."}
 					</span>
 					<input
-						id="file"
+						id="thumbnail"
 						type="file"
 						placeholder="File..."
-						{...register("file")}
+						{...register("thumbnail")}
 						onChange={changeFile}
 					/>
 				</label>
-				{errors?.file?.message}
 				<input type="submit" />
 			</form>
 		</>
@@ -99,5 +99,5 @@ function Form({ onSubmit, values }: FormProps) {
 export default Form;
 
 Form.defaultProps = {
-	values: null,
+	values: undefined,
 };

@@ -39,5 +39,5 @@ export type Inputs = {
 	body?: string;
 	categories?: string;
 	tag?: string;
-	file?: string;
+	thumbnail?: string;
 };
