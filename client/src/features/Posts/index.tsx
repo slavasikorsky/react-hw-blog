@@ -80,7 +80,7 @@ function Posts() {
 	};
 
 	const createPostHandler = () => {
-		setEditPost(false);
+		setEditPost(null);
 		setOpenPopup(!openPopup);
 	};
 
@@ -108,12 +108,12 @@ function Posts() {
 	};
 
 	const createHandler = async (values: Inputs) => {
-		const id = editPost._id;
+		const id = editPost?._id;
 		if (id) {
 			editPostHandler(values);
 			// clear
 			setOpenPopup(!openPopup);
-			setEditPost(false);
+			setEditPost(null);
 		} else {
 			createPost(values);
 			setOpenPopup(!openPopup);
