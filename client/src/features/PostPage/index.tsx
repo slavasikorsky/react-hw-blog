@@ -1,34 +1,45 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { useParams } from "react-router-dom";
-import useAxios from "../../hooks/useAxios";
 import Container from "../../components/Container";
+import { PostInterface } from "../../types/types";
 
 function PostPage() {
 	const routeParams = useParams<{ id: string | undefined }>();
-	const id = routeParams.id ? parseInt(routeParams.id, 10) : undefined;
+	const [post, setPost] = useState<PostInterface | undefined>();
+	const [error, setError] = useState<unknown | null>(null);
+	const { id } = routeParams;
 
-	const URL = "https://jsonplaceholder.typicode.com";
-	const { response, loading, error, sendData } = useAxios({
-		method: "GET",
-		baseURL: URL,
-		url: `/posts/${id}`,
-	});
-
-	useEffect(() => {
-		if (id) {
-			sendData();
+	const BASE_URL = `http://localhost:5010/posts`;
+	const getPost = async () => {
+		try {
+			const result = await axios.get(`${BASE_URL}/${id}`, {
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+			setPost(result.data);
+		} catch (err) {
+			setError(err);
 		}
-	}, [id, sendData]);
+	};
+	useEffect(() => {
+		getPost();
+	}, []);
 
 	return (
 		<Container>
-			{loading && <p>Loading...</p>}
 			{error && <p>{error.message}</p>}
-			{!loading && !error && (
+			{!error && (
 				<>
-					<h3>{response?.data.title}</h3>
-					<p>{response?.data.body}</p>
-					<span>Author: {response?.data.userId}</span>
+					<img
+						src={post?.thumbnail}
+						alt={post?.title}
+						style={{ maxWidth: "100%" }}
+					/>
+					<h3>{post?.title}</h3>
+					<p>{post?.body}</p>
+					<span>{post?.createdAt}</span>
 				</>
 			)}
 		</Container>
