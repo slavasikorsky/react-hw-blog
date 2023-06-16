@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import IPost from "../../types/types";
+import { PostInterface } from "../../types/types";
 
 const CardItem = styled.div`
 	border: 1px solid #c2c3c4;
@@ -9,12 +9,13 @@ const CardItem = styled.div`
 	border-radius: 6px;
 `;
 
-function Card({ id, title }: IPost) {
+function Card({ _id, title, body, thumbnail }: PostInterface) {
 	return (
-		<CardItem key={id}>
-			<small>id: {id}</small>
-			<h5>{title}</h5>
-			<Link to={`/post/${id}`}>Read more</Link>
+		<CardItem key={_id}>
+			<img src={thumbnail} alt={title} style={{ maxWidth: 150 }} />
+			<h4>{title}</h4>
+			<p>Shortly: {`${body?.slice(0, 10)} ...`}</p>
+			<Link to={`/post/${_id}`}>Read more</Link>
 		</CardItem>
 	);
 }

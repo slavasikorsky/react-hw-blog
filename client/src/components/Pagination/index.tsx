@@ -5,8 +5,7 @@ import { RootState } from "../../store/store";
 import Button from "../Button";
 
 interface IPagination {
-	pageCount: number;
-	postsLength: number;
+	numberOfPages: number;
 }
 
 const PaginationWrapper = styled.div`
@@ -17,27 +16,27 @@ const PaginationWrapper = styled.div`
 	gap: 10px;
 `;
 
-function Pagination({ pageCount, postsLength }: IPagination) {
+function Pagination({ numberOfPages }: IPagination) {
 	const dispatch = useDispatch();
 	const count = useSelector((state: RootState) => state.counter.value);
 
 	return (
 		<PaginationWrapper>
-			{count > 0 && (
+			{count > 1 && (
 				<Button onClick={() => dispatch(decrement())}>PREV!</Button>
 			)}
-			{count < postsLength - pageCount && (
+			{count < numberOfPages && (
 				<Button onClick={() => dispatch(increment())}>NEXT!</Button>
 			)}
 			<span>Page: </span>
 			<select
-				value={count / pageCount}
+				value={count}
 				onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
 					dispatch(goToPage(parseInt(e.target.value, 10)))
 				}
 			>
-				{[...Array(pageCount).keys()].map((page) => (
-					<option key={page} value={page}>
+				{[...Array(numberOfPages).keys()].map((page) => (
+					<option key={page + 1} value={page + 1}>
 						{page + 1}
 					</option>
 				))}

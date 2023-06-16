@@ -4,7 +4,7 @@ import axios from "axios";
 import styled from "styled-components";
 import { PostInterface } from "../../types/types";
 import { RootState } from "../../store/store";
-import Post from "../../components/Card";
+import Card from "../../components/Card";
 import Container from "../../components/Container";
 import Pagination from "../../components/Pagination";
 
@@ -18,9 +18,8 @@ function Blog() {
 	const [posts, setPosts] = useState<PostInterface[] | null>(null);
 	const count = useSelector((state: RootState) => state.counter.value);
 
-	const BASE_URL = "http://localhost:5010/posts/";
-	const pageCount = 10;
-	const postsLength = 100;
+	const BASE_URL = `http://localhost:5010/posts?page=${count}`;
+	const [numberOfPages, setNumberOfPages] = useState(0);
 
 	const getAllPosts = async () => {
 		try {
@@ -29,6 +28,7 @@ function Blog() {
 					"Content-Type": "application/json",
 				},
 			});
+			setNumberOfPages(result.data.numberOfPages);
 			setPosts(result.data.data);
 		} catch (err) {
 			console.log("Error:", err);
@@ -36,25 +36,26 @@ function Blog() {
 	};
 	useEffect(() => {
 		getAllPosts();
-	}, []);
+	}, [count]);
 
 	return (
 		<Container>
 			<h3>Posts</h3>
 			<>
-				{count}
 				<CardsWrapper>
 					{posts &&
 						posts.map((item: PostInterface) => (
-							<Post
+							<Card
 								key={item._id}
-								id={item._id}
+								_id={item._id}
 								title={item.title}
+								thumbnail={item.thumbnail}
+								body={item.body}
 							/>
 						))}
 				</CardsWrapper>
 
-				<Pagination pageCount={pageCount} postsLength={postsLength} />
+				<Pagination numberOfPages={numberOfPages} />
 			</>
 		</Container>
 	);

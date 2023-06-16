@@ -3,12 +3,10 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 
 export interface CounterState {
 	value: number;
-	postPerPage: number;
 }
 
 const initialState: CounterState = {
-	value: 0,
-	postPerPage: 10,
+	value: 1,
 };
 
 export const counterSlice = createSlice({
@@ -16,13 +14,13 @@ export const counterSlice = createSlice({
 	initialState,
 	reducers: {
 		increment: (state) => {
-			state.value += state.postPerPage;
+			state.value += 1;
 		},
 		decrement: (state) => {
-			state.value -= state.postPerPage;
+			state.value -= 1;
 		},
 		goToPage: (state, action: PayloadAction<number>) => {
-			state.value = action.payload * state.postPerPage;
+			state.value = action.payload;
 		},
 	},
 });
