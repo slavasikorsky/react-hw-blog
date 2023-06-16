@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import useAxios from "../../hooks/useAxios";
-import IPost from "../../types/types";
+import axios from "axios";
+import { PostInterface } from "../../types/types";
 import Card from "../Card";
 
 type PostProps = {
@@ -15,26 +15,40 @@ const CardsWrapper = styled.div`
 `;
 
 function FeaturedPosts({ postsCount }: PostProps) {
-	const URL = "https://jsonplaceholder.typicode.com";
-	// hardcoded
-	const { response, loading, error, sendData } = useAxios({
-		method: "GET",
-		baseURL: URL,
-		url: `/posts?_start=0&_limit=${postsCount}`,
-	});
+	const [lastPosts, setLastPosts] = useState<PostInterface[] | null>(null);
+	const [error, setError] = useState<unknown | boolean>(false);
 
+	const BASE_URL = `http://localhost:5010/posts`;
+	const getAllPosts = async () => {
+		try {
+			const result = await axios.get(BASE_URL, {
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+			setLastPosts(result.data.data.slice(0, postsCount));
+			setError(false);
+		} catch (err) {
+			setError(err);
+		}
+	};
 	useEffect(() => {
-		sendData();
+		getAllPosts();
 	}, []);
 	return (
 		<>
 			<h3>Featured posts</h3>
-			{loading && <p>Loading...</p>}
-			{error && <p>{error.message}</p>}
-			{!loading && !error && (
+			{error}
+			{!error && (
 				<CardsWrapper>
-					{response?.data.map((item: IPost) => (
-						<Card key={item.id} id={item.id} title={item.title} />
+					{lastPosts?.map((item: PostInterface) => (
+						<Card
+							key={item._id}
+							_id={item._id}
+							title={item.title}
+							thumbnail={item.thumbnail}
+							body={item.body}
+						/>
 					))}
 				</CardsWrapper>
 			)}
