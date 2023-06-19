@@ -18,6 +18,7 @@ import PublicRouter from "./PublicRouter";
 import { RootState } from "../store/store";
 import Posts from "../features/Posts";
 import Users from "../features/Users";
+import Profile from "../features/Profile";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -58,6 +59,7 @@ function Router() {
 					<Route path="/dashboard" element={<Dashboard />} />
 					<Route path="/posts" element={<Posts />} />
 					<Route path="/users" element={<Users />} />
+					<Route path="/profile" element={<Profile />} />
 				</Route>
 			</Routes>
 		</ThemeProvider>

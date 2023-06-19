@@ -39,7 +39,6 @@ function PostPage() {
 					/>
 					<h3>{post?.title}</h3>
 					<p>{post?.body}</p>
-					<span>{post?.createdAt}</span>
 				</>
 			)}
 		</Container>

@@ -46,3 +46,11 @@ export interface PostInterface {
 	createdAt?: Date;
 	comments?: [];
 }
+
+export interface User {
+	fullName: string;
+	email: string;
+	_id: number;
+	iat: number;
+	exp: number;
+}

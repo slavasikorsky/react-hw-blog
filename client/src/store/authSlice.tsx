@@ -1,16 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import jwtDecode from "jwt-decode";
+import { User } from "../types/types";
 
 const LOGIN = "LOGIN";
 const JWT_TOKEN = "jwtToken";
-interface User {
-	fullName: string;
-	email: string;
-	_id: number;
-	iat: number;
-	exp: number;
-}
+
 interface AuthState {
 	user: User | null;
 }
