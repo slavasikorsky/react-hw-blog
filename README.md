@@ -1,15 +1,9 @@
-# Homework React TS Blog - 3
+# Homework React TS Blog - 4
 
 Features:
 
--   Login/registration
--   Private/public layout
--   CRUD Posts
-
-TODO:
-
--   Show posts from DB instead faceAPI posts
--   New page with user settings - Profile
+-   Show blog posts from API
+-   User profile page
 -   Refactoring TS
 
 ## API
