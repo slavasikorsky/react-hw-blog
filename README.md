@@ -1,10 +1,8 @@
-# Homework React TS Blog - 4
+# Homework React TS Blog - 5
 
 Features:
 
--   Show blog posts from API
--   User profile page
--   Refactoring TS
+-   Blog post like/dislike/views
 
 ## API
 
