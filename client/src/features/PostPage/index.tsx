@@ -3,6 +3,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import Container from "../../components/Container";
 import { PostInterface } from "../../types/types";
+import Comments from "../Comments";
 
 function PostPage() {
 	const routeParams = useParams<{ id: string | undefined }>();
@@ -91,6 +92,7 @@ function PostPage() {
 					<button type="button" onClick={(e) => dislikesHandler(e)}>
 						Dislike
 					</button>
+					<Comments id={post?._id} />
 				</>
 			)}
 		</Container>
