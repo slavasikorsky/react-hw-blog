@@ -1,7 +1,8 @@
+import { ReactNode } from "react";
 import styled from "styled-components";
 
 type ContainerProps = {
-	children: JSX.Element | JSX.Element[] | any;
+	children: ReactNode;
 };
 
 const Block = styled.div`

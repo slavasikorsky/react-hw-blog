@@ -13,6 +13,7 @@ function Comments({ id }: CommentsType) {
 	const auth = useSelector((state: RootState) => state.auth);
 	const { user } = auth;
 	const [comments, setComments] = useState([]);
+	const [newComment, setNewComment] = useState([]);
 
 	async function getComments() {
 		try {

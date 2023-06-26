@@ -35,7 +35,7 @@ export interface IInputItem {
 }
 
 export interface PostInterface {
-	_id?: number;
+	id?: number;
 	title: string;
 	body: string;
 	tag?: string[];
