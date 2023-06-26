@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
-import axios from "axios";
 import { PostInterface } from "../../types/types";
 import Card from "../Card";
+import useAxios from "../../hooks/useAxios";
 
 type PostProps = {
 	postsCount: number;
 };
+
+interface FeaturedPostsInterface {
+	data: PostInterface[];
+}
 
 const CardsWrapper = styled.div`
 	display: flex;
@@ -15,33 +19,26 @@ const CardsWrapper = styled.div`
 `;
 
 function FeaturedPosts({ postsCount }: PostProps) {
-	const [lastPosts, setLastPosts] = useState<PostInterface[] | null>(null);
-	const [error, setError] = useState<unknown | boolean>(false);
+	const BASE_URL = `http://localhost:5010/`;
+	const { response, loading, error, sendData } =
+		useAxios<FeaturedPostsInterface>({
+			method: "GET",
+			baseURL: BASE_URL,
+			url: `posts`,
+		});
 
-	const BASE_URL = `http://localhost:5010/posts`;
-	const getAllPosts = async () => {
-		try {
-			const result = await axios.get(BASE_URL, {
-				headers: {
-					"Content-Type": "application/json",
-				},
-			});
-			setLastPosts(result.data.data.slice(0, postsCount));
-			setError(false);
-		} catch (err) {
-			setError(err);
-		}
-	};
 	useEffect(() => {
-		getAllPosts();
+		sendData();
 	}, []);
+
 	return (
 		<>
 			<h3>Featured posts</h3>
-			{error}
-			{!error && (
+			{loading && <p>loading</p>}
+			{error && <p>error</p>}
+			{!error && !loading && (
 				<CardsWrapper>
-					{lastPosts?.map((item: PostInterface) => (
+					{response?.data.data.slice(0, postsCount).map((item) => (
 						<Card
 							key={item._id}
 							_id={item._id}
