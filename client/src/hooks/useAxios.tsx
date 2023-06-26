@@ -1,33 +1,36 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
-const useAxios = (axiosParams: AxiosRequestConfig) => {
-	const [response, setResponse] = useState<AxiosResponse | undefined>();
-	const [error, setError] = useState<AxiosError<unknown, any> | undefined>();
-	const [loading, setLoading] = useState(true);
+interface UseAxiosResponse<T> {
+	response: AxiosResponse<T> | undefined;
+	error: AxiosError<unknown> | undefined;
+	loading: boolean;
+	sendData: () => Promise<void>;
+}
 
-	const fetchData = async (params: AxiosRequestConfig) => {
+const useAxios = <T,>(axiosParams: AxiosRequestConfig): UseAxiosResponse<T> => {
+	const [response, setResponse] = useState<AxiosResponse<T> | undefined>();
+	const [error, setError] = useState<AxiosError<unknown> | undefined>();
+	const [loading, setLoading] = useState<boolean>(true);
+
+	const fetchData = useCallback(async (params: AxiosRequestConfig) => {
 		try {
-			const result = await axios.request(params);
+			const result = await axios.request<T>(params);
 			setResponse(result);
 		} catch (err) {
-			setError(err as AxiosError<unknown, any>);
+			setError(err as AxiosError<unknown>);
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, []);
 
-	const sendData = () => {
-		if (axiosParams) {
-			fetchData(axiosParams);
-		}
-	};
+	const sendData = useCallback(async () => {
+		await fetchData(axiosParams);
+	}, [fetchData, axiosParams]);
 
 	useEffect(() => {
-		if (axiosParams.method === "GET" || axiosParams.method === "get") {
-			fetchData(axiosParams);
-		}
-	}, []);
+		sendData();
+	}, [sendData]);
 
 	return { response, error, loading, sendData };
 };

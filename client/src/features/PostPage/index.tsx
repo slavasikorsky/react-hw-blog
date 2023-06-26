@@ -4,36 +4,29 @@ import { useParams } from "react-router-dom";
 import Container from "../../components/Container";
 import { PostInterface } from "../../types/types";
 import Comments from "../Comments";
+import useAxios from "../../hooks/useAxios";
 
 function PostPage() {
 	const routeParams = useParams<{ id: string | undefined }>();
-	const [post, setPost] = useState<PostInterface | undefined>();
-	const [error, setError] = useState<unknown | null>(null);
-	const [view, serView] = useState(0);
+	const [err, setErr] = useState<string | null>(null);
+	const [view, setView] = useState(0);
 	const { id } = routeParams;
 
-	const BASE_URL = `http://localhost:5010/posts`;
-	const getPost = async () => {
-		try {
-			const result = await axios.get(`${BASE_URL}/${id}`, {
-				headers: {
-					"Content-Type": "application/json",
-				},
-			});
-			setPost(result.data);
-		} catch (err) {
-			setError(err);
-		}
-	};
+	const BASE_URL = `http://localhost:5010/posts/`;
+	const { response, loading, error, sendData } = useAxios<PostInterface>({
+		method: "GET",
+		baseURL: BASE_URL,
+		url: `${id}`,
+	});
 
 	const viewHandler = async () => {
 		await axios
 			.patch(`${BASE_URL}/${id}/viewcount`)
 			.then((res) => {
-				serView(res.data.views);
+				setView(res.data.views);
 			})
-			.catch((err) => {
-				setError(err);
+			.catch((errorMessage) => {
+				setErr(errorMessage);
 			});
 	};
 
@@ -43,11 +36,11 @@ function PostPage() {
 		e.preventDefault();
 		axios
 			.put(`${BASE_URL}/${id}/like`)
-			.then((res) => {
-				setPost(res.data);
+			.then(() => {
+				sendData();
 			})
-			.catch((err) => {
-				setError(err);
+			.catch((errorMessage) => {
+				setErr(errorMessage);
 			});
 	};
 
@@ -57,34 +50,41 @@ function PostPage() {
 		e.preventDefault();
 		axios
 			.delete(`${BASE_URL}/${id}/like`)
-			.then((res) => {
-				setPost(res.data);
+			.then(() => {
+				sendData();
 			})
-			.catch((err) => {
-				setError(err);
+			.catch((errorMessage) => {
+				setErr(errorMessage);
 			});
 	};
 
 	useEffect(() => {
-		getPost();
+		if (id) {
+			sendData();
+		}
+	}, [id]);
+
+	useEffect(() => {
 		viewHandler();
 	}, []);
 
 	return (
 		<Container>
+			{err && <p>{err}</p>}
+			{loading && <p>Loading...</p>}
 			{error && <p>{error.message}</p>}
-			{!error && (
+			{!error && !loading && (
 				<>
 					<img
-						src={post?.thumbnail}
-						alt={post?.title}
+						src={response?.data.thumbnail}
+						alt={response?.data.title}
 						style={{ maxWidth: "100%" }}
 					/>
-					<h3>{post?.title}</h3>
-					<p>{post?.body}</p>
+					<h3>{response?.data.title}</h3>
+					<p>{response?.data.body}</p>
 					<span>Views: {view}</span>
 					<br />
-					<span>Likes:{post?.likes}</span>
+					<span>Likes:{response?.data.likes}</span>
 					<br />
 					<button type="button" onClick={(e) => likesHandler(e)}>
 						Like
@@ -92,7 +92,7 @@ function PostPage() {
 					<button type="button" onClick={(e) => dislikesHandler(e)}>
 						Dislike
 					</button>
-					<Comments id={post?._id} />
+					<Comments id={response?.data._id} />
 				</>
 			)}
 		</Container>
