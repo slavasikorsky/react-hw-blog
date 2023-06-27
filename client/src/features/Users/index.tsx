@@ -10,11 +10,11 @@ interface DataRow {
 }
 
 function Users() {
-	const [users, setUsers] = useState([]);
+	const [users, setUsers] = useState<DataRow[] | null>(null);
 
 	const BASE_URL = "http://localhost:5010/user/list/";
 	// get all users
-	const [data, error, { handler: setFetch }] = useFetch("GET");
+	const { data, error, handler: setFetch } = useFetch<DataRow[]>("GET");
 
 	const editHandler = async (
 		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -41,7 +41,7 @@ function Users() {
 		},
 		{
 			name: "Edit",
-			selector: (row) => editRow(row),
+			cell: (row: DataRow) => editRow(row),
 		},
 	];
 

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import styled from "styled-components";
 import { PostInterface } from "../../types/types";
 import Card from "../Card";
-import useAxios from "../../hooks/useAxios";
+import useFetch from "../../hooks/useFetch";
 
 type PostProps = {
 	postsCount: number;
@@ -19,26 +19,24 @@ const CardsWrapper = styled.div`
 `;
 
 function FeaturedPosts({ postsCount }: PostProps) {
-	const BASE_URL = `http://localhost:5010/`;
-	const { response, loading, error, sendData } =
-		useAxios<FeaturedPostsInterface>({
-			method: "GET",
-			baseURL: BASE_URL,
-			url: `posts`,
-		});
+	const BASE_URL = `http://localhost:5010/posts`;
+	const {
+		data,
+		error,
+		handler: setFetch,
+	} = useFetch<FeaturedPostsInterface>("GET");
 
 	useEffect(() => {
-		sendData();
+		setFetch(BASE_URL);
 	}, []);
 
 	return (
 		<>
 			<h3>Featured posts</h3>
-			{loading && <p>loading</p>}
-			{error && <p>error</p>}
-			{!error && !loading && (
+			{error && <p>error.message</p>}
+			{!error && (
 				<CardsWrapper>
-					{response?.data.data.slice(0, postsCount).map((item) => (
+					{data?.data.slice(0, postsCount).map((item) => (
 						<Card
 							key={item._id}
 							_id={item._id}

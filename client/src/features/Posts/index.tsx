@@ -1,64 +1,58 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import DataTable, { TableColumn } from "react-data-table-component";
+import axios from "axios";
 import Form from "../../components/Form";
 import Popup from "../../components/Popup";
 import Button from "../../components/Button";
 import { PostInterface } from "../../types/types";
+import useFetch from "../../hooks/useFetch";
 
 interface DataRow {
 	_id: number;
 	title: string;
 	body: string;
-	editRow: (row: DataRow) => JSX.Element;
-	deleteRow: (row: DataRow) => JSX.Element;
+}
+
+interface IPost {
+	data?: PostInterface[];
 }
 
 function Posts() {
 	const [openPopup, setOpenPopup] = useState(false);
-	const [posts, setPosts] = useState<DataRow[]>([]);
+	const [posts, setPosts] = useState<PostInterface[] | undefined>(undefined);
 	const [editPost, setEditPost] = useState<PostInterface | null>(null);
+	const [errorMessage, setErrorMessage] = useState<Error | null>(null);
 
 	const BASE_URL = "http://localhost:5010/posts/";
 
-	const getAllPosts = async () => {
-		try {
-			const result = await axios.get(BASE_URL, {
-				headers: {
-					"Content-Type": "application/json",
-				},
-			});
-			setPosts(result.data.data);
-		} catch (err) {
-			console.log("Error:", err);
-		}
-	};
+	// get all posts hook
+	const { data, error, handler: setFetch } = useFetch<IPost>("GET");
+	// delete current post hook
+	const { handler: deleteFetch } = useFetch<IPost>("DELETE");
+	// edit post hook
+	const { handler: editFetch } = useFetch<IPost>("PATCH");
+	// create post hook
+	// const { handler: createFetch } = useFetch<IPost>("POST");
 
 	const editHandler = async (
 		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
 		id: number
 	) => {
 		e.preventDefault();
-		const editContent = posts.filter((post) => post._id === id);
-		setEditPost(editContent[0]);
+		const editContent = posts?.filter((post) => post._id === id);
+		if (editContent) {
+			setEditPost(editContent[0]);
+		}
 		setOpenPopup(!openPopup);
 	};
 
 	const editPostHandler = async (updatedContent: PostInterface) => {
 		try {
-			await axios.patch(
-				`${BASE_URL}${updatedContent._id}`,
-				updatedContent,
-				{
-					headers: {
-						"Content-Type": "application/json",
-					},
-				}
-			);
-			getAllPosts();
+			editFetch(`${BASE_URL}${updatedContent._id}`, updatedContent);
+			setFetch(BASE_URL);
 			setOpenPopup(!openPopup);
 		} catch (err) {
-			console.log("Error:", err);
+			setErrorMessage(err as Error);
 		}
 	};
 
@@ -68,14 +62,10 @@ function Posts() {
 	) => {
 		e.preventDefault();
 		try {
-			await axios.delete(`${BASE_URL}${id}`, {
-				headers: {
-					"Content-Type": "multipart/form-data",
-				},
-			});
-			getAllPosts();
+			deleteFetch(`${BASE_URL}/${id}`);
+			setFetch(BASE_URL);
 		} catch (err) {
-			console.log("Error:", err);
+			setErrorMessage(err as Error);
 		}
 	};
 
@@ -96,14 +86,16 @@ function Posts() {
 					formData.append(key, value);
 				}
 			});
+			// createFetch(BASE_URL, formData);
 			await axios.post(BASE_URL, formData, {
 				headers: {
 					"Content-Type": "multipart/form-data",
 				},
 			});
-			getAllPosts();
+
+			setFetch(BASE_URL);
 		} catch (err) {
-			console.log("Error:", err);
+			setErrorMessage(err as Error);
 		}
 	};
 
@@ -143,21 +135,27 @@ function Posts() {
 		},
 		{
 			name: "Edit",
-			selector: (row) => editRow(row),
+			cell: (row: DataRow) => editRow(row),
 		},
 		{
 			name: "Delete",
-			selector: (row) => deleteRow(row),
+			cell: (row: DataRow) => deleteRow(row),
 		},
 	];
 
 	useEffect(() => {
-		getAllPosts();
+		setFetch(BASE_URL);
 	}, []);
+
+	useEffect(() => {
+		setPosts(data?.data);
+	}, [data]);
 
 	return (
 		<>
 			<h1>Posts</h1>
+			{errorMessage && <p>{errorMessage.message}</p>}
+			{error && <p>{error.message}</p>}
 			{posts && <DataTable columns={columns} data={posts} />}
 			<Button onClick={() => createPostHandler()}>Create new post</Button>
 			<Popup trigger={openPopup} setTrigger={setOpenPopup}>

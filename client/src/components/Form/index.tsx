@@ -6,7 +6,7 @@ import { PostInterface } from "../../types/types";
 
 type FormProps = {
 	onSubmit: (data: PostInterface) => void;
-	values: PostInterface;
+	values: PostInterface | null;
 };
 
 const schema = yup.object().shape({
