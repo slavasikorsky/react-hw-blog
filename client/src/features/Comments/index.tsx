@@ -1,11 +1,47 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import styled from "styled-components";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import ShowUserName from "../../helpers/showUserName";
 
 type CommentsType = {
 	id: number;
 };
+
+const CommentsList = styled.ul`
+	list-style: none;
+	padding: 0 0 0 20px;
+	li {
+		margin: 0 0 20px;
+		padding: 0 0 10px;
+		border-bottom: 1px solid #ccc;
+	}
+	button {
+		margin: 0 10px;
+		height: 26px;
+	}
+`;
+
+const FormReply = styled.form`
+	display: none;
+	&.active {
+		display: flex;
+		flex-flow: nowrap;
+		margin: 10px 0 20px;
+	}
+`;
+
+const FormComment = styled.form`
+	display: flex;
+	flex-flow: nowrap;
+	margin: 10px 0 20px;
+`;
+
+const ReplyList = styled.div`
+	font-size: 12px;
+	padding-left: 10px;
+`;
 
 function Comments({ id }: CommentsType) {
 	const BASE_URL = `http://localhost:5010/posts/`;
@@ -81,6 +117,7 @@ function Comments({ id }: CommentsType) {
 	const showCommentReplyForm = (e) => {
 		e.preventDefault();
 		const formReply = e.target.parentNode.nextSibling;
+		console.log(formReply);
 		formReply.classList.toggle("active");
 	};
 
@@ -97,11 +134,12 @@ function Comments({ id }: CommentsType) {
 	};
 
 	return (
-		<div>
-			<ul>
+		<>
+			<CommentsList>
 				{comments &&
 					comments.map((comment) => (
 						<li key={comment._id}>
+							<ShowUserName id={comment?.userId} />
 							<span>{comment.text}</span>
 							<span>
 								<span>| Likes: {comment.likes}</span>
@@ -118,8 +156,7 @@ function Comments({ id }: CommentsType) {
 									Reply
 								</button>
 							</span>
-
-							<form
+							<FormReply
 								onSubmit={(e) => {
 									e.preventDefault();
 									handlerCommentReply(
@@ -132,31 +169,31 @@ function Comments({ id }: CommentsType) {
 							>
 								<textarea name="reply" placeholder="Reply..." />
 								<button type="submit">Submit</button>
-							</form>
-							{comment.replies.length > 0 && (
-								<div>
+							</FormReply>
+							{comment?.replies.length > 0 && (
+								<ReplyList>
 									<b>Replyes:</b>
 									{comment.replies &&
 										comment.replies.map((reply) => (
-											<p>{reply}</p>
+											<p key={reply}>{reply}</p>
 										))}
-								</div>
+								</ReplyList>
 							)}
 						</li>
 					))}
-			</ul>
+			</CommentsList>
 			{user ? (
-				<form onSubmit={(e) => handlerSubmit(e)}>
+				<FormComment onSubmit={(e) => handlerSubmit(e)}>
 					<textarea
 						value={newComment}
 						onChange={(e) => setNewComment(e.target.value)}
 					/>
 					<button type="submit">Add comment</button>
-				</form>
+				</FormComment>
 			) : (
 				<h3>Please login to post your shitty comments</h3>
 			)}
-		</div>
+		</>
 	);
 }
 
