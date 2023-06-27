@@ -3,14 +3,12 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import jwtDecode from "jwt-decode";
 import { User } from "../types/types";
 
-const LOGIN = "LOGIN";
 const JWT_TOKEN = "jwtToken";
 
 interface AuthState {
 	user: User | null;
 }
 interface LoginAction {
-	type: typeof LOGIN;
 	result: User;
 	token: string;
 }
@@ -20,14 +18,13 @@ const initialState: AuthState = {
 };
 
 // get or remove storage token
-if (localStorage.getItem(JWT_TOKEN)) {
-	const decodeToken = jwtDecode<{ exp: number }>(
-		localStorage.getItem(JWT_TOKEN)!
-	);
+const token = localStorage.getItem(JWT_TOKEN);
+if (token) {
+	const decodeToken = jwtDecode<{ exp: number }>(token);
 	if (decodeToken.exp * 1000 < Date.now()) {
 		localStorage.removeItem(JWT_TOKEN);
 	} else {
-		initialState.user = jwtDecode<User>(localStorage.getItem(JWT_TOKEN)!);
+		initialState.user = jwtDecode<User>(token);
 	}
 }
 

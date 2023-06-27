@@ -1,29 +1,39 @@
 import { useState } from "react";
+import IPost, { IInputItem, PostInterface } from "../types/types";
 
-const useFetch = (method: "POST" | "PUT" | "DELETE" | "GET" | "PATCH") => {
-	const [data, setData] = useState<any>(false);
-	const [error, setError] = useState<string | unknown>(null);
+type FetchResult<T> = {
+	data: T | null;
+	error: { message: string } | null;
+};
 
-	const handler = async (URL: string, body: FormData) => {
-		const response = await fetch(URL, {
+type BodyType = Record<string, unknown> | IInputItem | PostInterface | IPost;
+
+const useFetch = <T,>(
+	method: "POST" | "PUT" | "DELETE" | "GET" | "PATCH"
+): FetchResult<T> & {
+	handler: (url: string, body?: BodyType) => void;
+} => {
+	const [data, setData] = useState<T | null>(null);
+	const [error, setError] = useState<FetchResult<T>["error"]>(null);
+
+	const handler = async (URL: string, body?: BodyType) => {
+		await fetch(URL, {
 			method,
+			body: body ? JSON.stringify(body) : null,
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: body ? JSON.stringify(body) : null,
 		}).then(async (res) => {
 			try {
 				const newData = await res.json();
-				return newData;
+				setData(newData);
 			} catch (err) {
-				setError(err);
+				setError({ message: "An error occurred while data fetching" });
 			}
-			return false;
 		});
-		setData(response);
 	};
 
-	return [data, error, { handler }];
+	return { data, error, handler };
 };
 
 export default useFetch;
