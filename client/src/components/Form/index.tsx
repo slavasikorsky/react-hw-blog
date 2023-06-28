@@ -1,11 +1,13 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import ReactQuill from "react-quill";
 import * as yup from "yup";
 import { useState } from "react";
 import { PostInterface } from "../../types/types";
+import "react-quill/dist/quill.snow.css";
 
 type FormProps = {
-	onSubmit: (data: PostInterface) => void;
+	onSubmit: (data: PostInterface, editorState: string | null) => void;
 	values: PostInterface | null;
 };
 
@@ -26,10 +28,11 @@ function Form({ onSubmit, values }: FormProps) {
 		resolver: yupResolver(schema),
 	});
 
+	const [editorState, setEditorState] = useState<string | null>(null);
 	const [value, setValue] = useState<PostInterface>(values);
 
 	const submitForm = () => {
-		onSubmit(value);
+		onSubmit(value, editorState);
 	};
 
 	const changeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,12 +58,11 @@ function Form({ onSubmit, values }: FormProps) {
 					{...register("title", { required: true })}
 					onChange={changeForm}
 				/>
-				<input
-					type="text"
-					placeholder="Body..."
-					value={value?.body || ""}
+				<ReactQuill
+					theme="snow"
+					value={editorState}
 					{...register("body")}
-					onChange={changeForm}
+					onChange={setEditorState}
 				/>
 				<input
 					type="text"

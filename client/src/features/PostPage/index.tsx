@@ -81,7 +81,11 @@ function PostPage() {
 						style={{ maxWidth: "100%" }}
 					/>
 					<h3>{response?.data.title}</h3>
-					<p>{response?.data.body}</p>
+					<div
+						dangerouslySetInnerHTML={{
+							__html: response?.data.body,
+						}}
+					/>
 					<span>Views: {view}</span>
 					<br />
 					<span>Likes:{response?.data.likes}</span>
