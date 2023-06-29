@@ -6,6 +6,7 @@ import Footer from "../features/Footer";
 import Header from "../features/Header";
 import Sidebar from "../features/Sidebar";
 import Wrapper from "../components/Wrapper";
+import MetaContent from "../components/MetaContent";
 
 type LayoutProps = {
 	children?: JSX.Element;
@@ -22,6 +23,7 @@ const DashboardWrapper = styled.div`
 function PrivateLayout({ children }: LayoutProps) {
 	return (
 		<>
+			<MetaContent />
 			<Header />
 			<Container>
 				<Wrapper>
