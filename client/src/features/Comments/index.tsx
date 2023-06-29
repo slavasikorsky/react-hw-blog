@@ -6,8 +6,16 @@ import { RootState } from "../../store/store";
 import ShowUserName from "../../helpers/showUserName";
 
 type CommentsType = {
-	id: number;
+	id: number | undefined;
 };
+
+interface CommentInterface {
+	_id: number;
+	text: string;
+	userId: number;
+	likes: number;
+	replies: string[];
+}
 
 const CommentsList = styled.ul`
 	list-style: none;
@@ -48,29 +56,19 @@ function Comments({ id }: CommentsType) {
 
 	const auth = useSelector((state: RootState) => state.auth);
 	const { user } = auth;
-	const [comments, setComments] = useState([]);
-	const [newComment, setNewComment] = useState([]);
+	const [comments, setComments] = useState<CommentInterface[] | null>(null);
+	const [newComment, setNewComment] = useState<string | undefined>(undefined);
+	const [reply, setReply] = useState<string>("");
+	const [errorMessage, setErrorMessage] = useState<Error | null>(null);
 
 	async function getComments() {
 		try {
 			const res = await axios.get(`${BASE_URL}${id}/comments`);
 			setComments(res.data);
 		} catch (err) {
-			console.log(err);
+			setErrorMessage(err as Error);
 		}
 	}
-	/* 
-	async function getUserName(userId: number) {
-		try {
-			const res = await axios.get(`http://localhost:5010/user/${userId}`);
-			console.log(res.data);
-			return res.data.fullName;
-		} catch (err) {
-			console.log(err);
-		}
-		return false;
-	}
-*/
 
 	useEffect(() => {
 		if (id !== undefined) {
@@ -78,7 +76,7 @@ function Comments({ id }: CommentsType) {
 		}
 	}, [id]);
 
-	const handlerSubmit = async (e) => {
+	const handlerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const commentBody = {
 			text: newComment,
@@ -98,43 +96,55 @@ function Comments({ id }: CommentsType) {
 			setComments(res.data.comments);
 			setNewComment("");
 		} catch (err) {
-			console.log(err);
+			setErrorMessage(err as Error);
 		}
 	};
 
-	const handlerLike = async (e, commentId) => {
+	const handlerLike = async (
+		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+		commentId: number
+	) => {
 		e.preventDefault();
 		await axios
 			.patch(`${BASE_URL}${id}/comments/${commentId}/like`)
 			.then((res) => {
 				setComments(res.data.comments);
 			})
-			.catch((error) => {
-				console.log(error);
+			.catch((err) => {
+				setErrorMessage(err as Error);
 			});
 	};
 
-	const showCommentReplyForm = (e) => {
+	const showCommentReplyForm = (
+		e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+	) => {
 		e.preventDefault();
-		const formReply = e.target.parentNode.nextSibling;
-		console.log(formReply);
-		formReply.classList.toggle("active");
+		const target = e.target as Element;
+		const formReply = target.parentNode?.nextSibling as Element;
+		formReply?.classList.toggle("active");
 	};
 
-	const handlerCommentReply = async (e, commentId, text) => {
+	const handlerCommentReply = async (
+		e: React.FormEvent<HTMLFormElement>,
+		commentId: number,
+		text: string
+	) => {
+		e.preventDefault();
 		try {
 			const { data } = await axios.patch(
 				`${BASE_URL}${id}/comments/${commentId}/reply`,
 				{ text }
 			);
 			setComments(data.comments);
+			setReply("");
 		} catch (err) {
-			console.log(err);
+			setErrorMessage(err as Error);
 		}
 	};
 
 	return (
 		<>
+			{errorMessage && <p>{errorMessage.message}</p>}
 			<CommentsList>
 				{comments &&
 					comments.map((comment) => (
@@ -142,7 +152,7 @@ function Comments({ id }: CommentsType) {
 							<ShowUserName id={comment?.userId} />
 							<span>{comment.text}</span>
 							<span>
-								<span>| Likes: {comment.likes}</span>
+								<span> | Likes: {comment.likes}</span>
 								<button
 									type="button"
 									onClick={(e) => handlerLike(e, comment._id)}
@@ -158,24 +168,23 @@ function Comments({ id }: CommentsType) {
 							</span>
 							<FormReply
 								onSubmit={(e) => {
-									e.preventDefault();
-									handlerCommentReply(
-										e,
-										comment._id,
-										e.target.reply.value
-									);
-									e.target.reply.value = "";
+									handlerCommentReply(e, comment._id, reply);
 								}}
 							>
-								<textarea name="reply" placeholder="Reply..." />
+								<textarea
+									name="reply"
+									placeholder="Reply..."
+									value={reply}
+									onChange={(e) => setReply(e.target.value)}
+								/>
 								<button type="submit">Submit</button>
 							</FormReply>
 							{comment?.replies.length > 0 && (
 								<ReplyList>
-									<b>Replyes:</b>
+									<b>Replies:</b>
 									{comment.replies &&
-										comment.replies.map((reply) => (
-											<p key={reply}>{reply}</p>
+										comment.replies.map((item) => (
+											<p key={item}>{item}</p>
 										))}
 								</ReplyList>
 							)}
