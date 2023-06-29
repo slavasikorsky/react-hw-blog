@@ -51,6 +51,7 @@ export interface User {
 	fullName: string;
 	email: string;
 	_id: number;
+	id?: number;
 	iat: number;
 	exp: number;
 }

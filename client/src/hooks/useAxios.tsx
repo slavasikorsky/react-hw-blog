@@ -30,7 +30,7 @@ const useAxios = <T,>(axiosParams: AxiosRequestConfig): UseAxiosResponse<T> => {
 
 	useEffect(() => {
 		sendData();
-	}, [sendData]);
+	}, []);
 
 	return { response, error, loading, sendData };
 };
