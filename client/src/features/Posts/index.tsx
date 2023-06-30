@@ -74,7 +74,7 @@ function Posts() {
 		setOpenPopup(!openPopup);
 	};
 
-	const createPost = async (args: PostInterface, bodyContent: string) => {
+	const createPost = async (args: PostInterface) => {
 		try {
 			const formData = new FormData();
 			Object.entries(args).forEach(([key, value]) => {
@@ -86,7 +86,6 @@ function Posts() {
 					formData.append(key, value);
 				}
 			});
-			formData.append("body", bodyContent);
 			// createFetch(BASE_URL, formData);
 
 			await axios.post(BASE_URL, formData, {
@@ -101,10 +100,7 @@ function Posts() {
 		}
 	};
 
-	const createHandler = async (
-		values: PostInterface,
-		bodyContent: string
-	) => {
+	const createHandler = async (values: PostInterface) => {
 		const id = editPost?._id;
 		if (id) {
 			editPostHandler(values);
@@ -112,7 +108,7 @@ function Posts() {
 			setOpenPopup(!openPopup);
 			setEditPost(null);
 		} else {
-			createPost(values, bodyContent);
+			createPost(values);
 			setOpenPopup(!openPopup);
 		}
 	};

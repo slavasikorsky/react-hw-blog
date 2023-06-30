@@ -3,6 +3,9 @@
 Features:
 
 -   Blog post like/dislike/views
+-   Meta title/description for all pages
+-   Comments, replies for comments
+-   Editor for blog post body text
 
 ## API
 
